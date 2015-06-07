@@ -2,7 +2,7 @@ PSY 441 Senior Capstone Reproducibility and Statistics Assignment
 
 Welcome!
 
-I'm a student at EOU, and this an experiment I did with my partner. We investigated the specific effects of combined positive and negative verbal feedback, when perceived as genuine, on motivation.  
+I'm a student at EOU, and this is an experiment I did with my partner. We investigated the specific effects of combined positive and negative verbal feedback, when perceived as genuine, on motivation.  
 You'll find everything you need to completely reproduce this assignment, except for this README, in the data directory.
 
 Data Directory Contents:
