@@ -1,0 +1,89 @@
+#How the data were generated
+
+The first thing I did was to set a random seed to ensure that the data
+are fully reproducible.
+
+```{r}
+set.seed(2073) #I could have used any number. 2073 is just the first I though of.
+```
+
+Next, I determined how many participants (N) I would have for Republicans (rN),
+Independents (iN), and Democrats (dN). Imagine participants had to choose which
+party they identified with the most. I made sure I had an even number so
+I could have equal numbers of males and females. I also determined the total
+number of participants so I could generate the rest of the data more easily.
+
+```{r}
+rN<-23
+iN<-17
+dN<-26
+#Make sure the total is even
+totN<-rN+iN+dN
+```
+I created party affiliation by repeating each type of participant and combining them
+together. I then doubled these affiliations so I could have two observations of each
+participant.
+
+```{r}
+party<-rep(c(rep("republican",rN),rep("independent",iN),rep("democrat",dN)),times=2)
+```
+Then I created a variable to indicate whether the observation came before or after
+my crucial imaginary manipulation (remember, these are completely fabricated data).
+```{r}
+testtime<-rep(c("pre","post"),each=totN)
+```
+Next, I created a variable for optimism scores. I imagined I had some survey with 10
+10-point Likert scale questions. The scores here, represent the total score that could
+range from 0 (not at all optimistic) to 100 (completely optimistic). I created the
+pretest scores by sampling from a random normal distribution in a way that should
+correlate with affiliation. To create the posttest scores, I added values from
+another random normal distribution to the original scores so the scores should
+correlate.
+```{r}
+optimismscore<-round(rnorm(totN,30+50*(1:totN)/totN, 12))
+optimismscore<-c(optimismscore, optimismscore+round(rnorm(totN,5,7)))
+```
+Next, I created a binary variable to indicate agreement with the imaginary
+statement "The minimum wage should be increased" before and after the manipulation.
+I created this variable so it should correlate with political affiliation and so
+the pre and post scores would correlate with one another. Then I changed the
+variable to a factor with levels no and yes.
+```{r}
+minwage<-c(rbinom(totN,1,.2+.6*(1:totN)/totN),rbinom(totN,1,.3+.55*(1:totN)/totN))
+minwage<-as.factor(minwage)
+levels(minwage)=c("no", "yes")
+```
+Next, I created another binary variable to indicate the sex of the participant.
+```{r}
+sex<-rep(sample(rep(c("male","female"),each=totN/2)),times=2)
+```
+Then, I generated incomes for each participant based on their political affiliation.
+```{r}
+income=rep(c(rweibull(rN,1.8,54),rweibull(iN,3,56),rweibull(dN,2.2,32)),times=2)
+```
+I didn't want the data to be grouped by party or be roughly in order of optimism
+scores, as that would almost never happen in the real world when random sampling.
+To mix things up, I randomly sampled the total number of participants to create
+a mixed ordering that would keep data for each participant together.
+```{r}
+order<-sample(1:totN)
+order<-c(order,order+totN)
+```
+Then I created a variable for each subject that indicates whether they were first,
+last, or somewhere in the middle.
+```{r}
+subject<-as.factor(rep(1:(totN),times=2))
+```
+With all the data I need to run the analyses my students are likely to encounter,
+I stitched the variables together as a data frame before saving the data frame
+as politics.csv.
+```{r}
+politics<-data.frame(subject=subject,
+                    party=party[order],
+                    testtime=testtime[order],
+                    optimismscore=optimismscore[order],
+                    minwage=minwage[order],
+                    sex=sex[order],
+                    income=income[order])
+write.csv(politics, "politics.csv", row.names=FALSE)
+```

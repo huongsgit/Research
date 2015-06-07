@@ -1,0 +1,24 @@
+#Codebook for politics.csv
+
+The data in politics.csv represent fabricated data obtained from an imaginary
+experiment. In which participants were given a survey measuring their optimism
+using 10 10-point Likert scale questions (higher is more optimistic). After
+taking the optimism survey, they indicated whether or not they agreed with
+the statement "The minimum wage should be increased." After completing these
+initial measures, all participants watched 10 minutes of
+*America's Funniest Home Videos*. After watching the videos they took the
+survey again and again indicated whether they supported minimum wage increase.
+Following this post test, all participants indicated which political party they
+most affiliated with (i.e. Republican, Democrat, or Independent), what their
+annual income was, and their sex.
+
+In total, there were six variables.
+
+* **subject**: The order the participant participated in the experiment (e.g. 1 = first)
+* **party**: Political party affiliation (republican, democrat, or independent;
+people claiming other party affiliations were excluded from the experiment).
+* **testtime**: Which version of the test they took (i.e. pre- or post-videos).
+* **optimismscore**: The score on the optimism survey for the corresponding testtime.
+* **minwage**: Whether or not they supported increasing the minimum wage (yes or no).
+* **sex**: the participants' sex (male or female).
+* **income**: the participants' income in thousands of dollars.

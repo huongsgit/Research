@@ -1,0 +1,78 @@
+#440 Reproducibility and Statistics Assignment Homework
+
+<!-- This is an Rmd comment. -->
+<!--
+You can make comments several lines long by inserting
+the text in between the the start and the end of the 
+comment.
+
+Comments are where I'll tell you what to do. You should
+use the space directly below the comments to do what
+the comment asks. You should also describe what you're
+doing to make it obvious to the reader so they can
+easily follow your logic in a fully reproducible way.
+For any statistical tests you run, you should explain
+the results in plain English and present the statistics
+as you would in an APA style manuscript. For any symbols
+you don't know how to use/can't use, feel free to use the name
+instead (e.g. alpha)
+--> 
+
+<!-- Load the politics.csv data file. -->
+
+
+
+<!-- 
+Check the structure.
+subject, party, testtime, minwage, and sex need to be factors.
+optimismscore and income should be integer and numeric vectors.
+Fix any variables that aren't right.
+-->
+
+
+<!-- Find the minimum, mean, and variance for posttest
+optimism scores. -->
+
+
+<!-- Create a histogram of posttest optimism scores.
+Feel free to use the default ugly settings since
+we didn't cover how to do this in ggplot2. If
+you're a real go-getter, see if you can figure
+out how to make a prettier histogram with better
+labels, etc. using ggplot2. -->
+
+
+<!-- Run a test to determine whether political affiliation
+is independent of one's gender.
+Present the data supporting your analyses in graphical or
+tabular form.
+-->
+
+
+<!-- Run a test to determine whether or not males and females
+have different incomes.
+Create a graph to display your data that includes the relevant
+means and standard errors.-->
+
+
+<!-- See if male and females with different political affiliations
+have different posttest optimism scores. Create a graph to display
+your data that includes the relevant means and standard errors.-->
+
+<!-- Create a line graph for the same data. With
+error bars of course!-->
+
+
+<!-- Run a test to see if optimism scores pre- and post
+watching videos depends on sex.-->
+
+
+<!-- Run a Multiple Regression Analysis to see
+whether you can predict someones posttest optimism
+scores from their pretest optimism scores and party
+affiliation. Create a figure that shows the distributions
+of pre- and posttest optimism scores and sex and create
+lines that best fit the data for both sexes regardless of
+whether the lines are warranted based on the statistical
+analyses-->
+

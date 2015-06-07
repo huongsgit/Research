@@ -1,0 +1,314 @@
+#440 Reproducibility and Statistics Assignment Example
+
+<!-- This is an Rmd comment. -->
+<!--
+You can make comments several lines long by inserting
+the text in between the the start and the end of the 
+comment.
+
+Comments are where I'll tell you what to do. You should
+use the space directly below the comments to do what
+the comment asks. You should also describe what you're
+doing to make it obvious to the reader so they can
+easily follow your logic in a fully reproducible way.
+For any statistical tests you run, you should explain
+the results in plain English and present the statistics
+as you would in an APA style manuscript. For any symbols
+you don't know how to use/can't use, feel free to use the name
+instead (e.g. alpha)
+--> 
+
+<!-- Load the politics.csv data file. -->
+First we need to load the data.
+
+```{r}
+pols<-read.csv("politics.csv")
+```
+
+<!-- 
+Check the structure.
+subject, party, testtime, minwage, and sex need to be factors.
+optimismscore and income should be integer and numeric vectors.
+Fix any variables that aren't right.
+-->
+Let's take a look at the data.
+```{r}
+str(pols)
+```
+
+Subject should be a factor variable. Additionally, I prefer
+it when "pre" precedes "post". So I'm going to refactor those
+variables.
+```{r}
+pols$subject<-factor(pols$subject)
+pols$testtime<-factor(pols$testtime, levels=c("pre", "post"))
+```
+
+<!-- Find the minimum, mean, and median incomes. -->
+I'd like to find the minimum, mean, and median incomes. I can do
+all this and more in one fell swoop.
+
+```{r}
+summary(pols$income)
+```
+
+<!-- Create a histogram of incomes.
+Feel free to use the default ugly settings since
+we didn't cover how to do this in ggplot2. If
+you're a real go-getter, see if you can figure
+out how to make a prettier histogram with better
+labels, etc. using ggplot2. -->
+Let's see how incomes are distributed. I noticed that there
+each income is represented twice. So to avoid over counting
+incomes, I'll only use the data from the posttests to create
+a histogram.
+
+```{r}
+hist(pols$income[pols$testtime=="post"])
+```
+
+<!-- Run a test to determine whether political affiliation
+is independent of one's support to increase the minimum wage before
+they watch the videos.
+Present the data supporting your analyses in graphical or
+tabular form.
+-->
+
+Let's see if political affiliation and minimum wage support
+are independent before the participants watched *America's Funniest
+Home Videos*. To do this I need to calculate the frequency
+that individuals appear in different political groups. Then I'll
+use a Chi-Square test of independence to test the hypothesis that
+affiliation and support are independent. Again, I don't want
+to count people twice, so I'll focus on the posttest data.
+
+```{r}
+tab<-table(pols$party[pols$testtime=="pre"],pols$minwage[pols$testtime=="pre"])
+tab
+```
+
+These are the frequencies individuals fell into the different
+conditions.
+
+```{r}
+chisq.test(pols$party[pols$testtime=="pre"],pols$minwage[pols$testtime=="pre"])
+```
+
+Political affiliation is not independent of support for minimum
+wage increases, Chi-Square(2) = 6.4, p = .04.
+
+<!-- Run a test to determine whether or not males and females
+have different optimism scores before they watch the videos.
+Create a graph to display your data that includes the relevant
+means and standard errors.
+Note we didn't create this graph in the instructions. We're doing
+this instead of the first bar graph in the instructions.
+-->
+To see whether or not males and females have different optimism
+scores before watching *AFHV* we can run an independent t-test.
+
+```{r}
+t.test(pols$optimism[pols$sex=="male" & pols$testtime=="pre"],pols$optimism[pols$sex=="female" & pols$testtime=="pre"])
+```
+
+Males and females do not differ in optimism before watching *AFHV*,
+t(62.9) = -.37, p = .71.
+
+To create the figure, I need to include the dplyr library. Then
+I'll use it to summarize the politics data set and find the means
+and standard errors for the different conditions. Then I'll need
+the ggplot2 library to create a nice plot that's easy to work with.
+I'll do the same thing for any other graphs I create unless I
+specify otherwise.
+
+```{r}
+library("dplyr")
+temp<-pols[pols$testtime=="pre",]%>%group_by(sex)%>%summarize(means=mean(optimismscore),
+              sems=sd(optimismscore)/sqrt(length(optimismscore)))
+library("ggplot2")
+f<-ggplot(temp,aes(x=factor(sex),y=means))+
+    geom_bar(stat="identity", color="black",fill=c("deeppink","deepskyblue2"))+
+    geom_errorbar(aes(ymax=means+sems, ymin=means-sems), width=.1)
+f
+```
+
+That's a bare minimum graph that might be ok for others, but not for me.
+
+```{r}
+f<-f+ggtitle("Video Optimism Scores by Sex")+
+    labs(x="Sex", y="Pretest Optimism Scores\n(higher=more optimistic")+
+    scale_x_discrete(breaks=c("female","male"),labels=c("Female","Male"))+
+    theme(plot.title=element_text(size=15,face="bold",vjust=.5))+
+    theme(axis.title.x=element_text(size=12,face="bold",vjust=-.25))+
+    theme(axis.title.y=element_text(size=12,face="bold",vjust=1))+
+    theme(axis.text.x=element_text(size=10,face="bold",color="black"))+
+    theme(axis.text.y=element_text(size=10,face="bold",color="black"))+
+    coord_cartesian(ylim=c(min(temp$means)-2*max(temp$sems),max(temp$means)+2*max(temp$sems)))+
+    theme(panel.border=element_blank(), axis.line=element_line())+
+    theme(panel.grid.major.x=element_blank())+
+    theme(panel.grid.major.y=element_line(color="darkgrey"))+
+    theme(panel.grid.minor.y=element_blank())
+f
+```
+
+That's much better.
+
+<!-- See if male and females with different political affiliations
+have different incomes. Create a graph to display your data that
+includes the relevant means and standard errors.-->
+Let's see if party affiliation and sex predict incomes independently
+or in an interaction using a 2-way between-subjects ANOVA.
+
+```{r}
+ summary(aov(income~party*sex,data=pols[pols$testtime=="pre",]))
+```
+
+Income is related to party affiliation, F(2, 60) = 4.54, p = .015, but not
+to sex, F(1, 60) = 3.58, p = .064, or an interaction between affiliation
+and sex, F(2, 60) = .07, p = .93.
+
+To create the plot and manually adjust the fill, I need to use
+hexadecimal color codes. To convert the named colors I like
+to hexadecimal, I need to use the gplots library.
+
+```{r}
+temp<-pols[pols$testtime=="pre",]%>%group_by(party,sex)%>%
+    summarize(means=mean(income),sems=sd(income)/sqrt(length(income)))
+library("gplots")
+col1=col2hex("deeppink")
+col2=col2hex("deepskyblue2")
+f<-ggplot(temp, aes(x=party, y=means, fill=sex))+
+    geom_bar(stat="identity",position=position_dodge())+
+    scale_fill_manual(values=c(col1,col2),name="Sex",breaks=c("female","male"),labels=c("Female", "Male"))+
+    theme(legend.key=element_rect(color="black"))+
+    geom_errorbar(aes(ymax=means+sems, ymin=means-sems),width=.2,position=position_dodge(.9))+
+    ggtitle("Incomes by Sex and Political Affiliation")+
+    labs(x="Political Party Affiliation",y="Income\n(thousands of dollars)")+
+    scale_x_discrete(breaks=c("democrat","independent","republican"),labels=c("Democrat","Independent","Republican"))+
+    theme(plot.title=element_text(size=15,face="bold",vjust=.5))+
+    theme(axis.title.x=element_text(size=12,face="bold",vjust=-.25))+
+    theme(axis.title.y=element_text(size=12,face="bold",vjust=1))+
+    theme(axis.text.x=element_text(size=10,face="bold",color="black"))+
+    theme(axis.text.y=element_text(size=10,face="bold",color="black"))+
+    coord_cartesian(ylim=c(min(temp$means)-2*max(temp$sems),max(temp$means)+2*max(temp$sems)))+
+    theme(panel.border=element_blank(),axis.line=element_line())+
+    theme(panel.grid.major.x=element_blank())+
+    theme(panel.grid.major.y=element_line(color="darkgrey"))+
+    theme(panel.grid.minor.y=element_blank())+
+    theme(legend.position=c(.2,.76))+
+    theme(legend.background=element_blank())+
+    theme(legend.background=element_rect(color="black"))+
+    theme(legend.title=element_blank())+
+    theme(legend.title=element_text(size=12))+
+    theme(legend.title.align=.5)+
+    theme(legend.text=element_text(size=10,face="bold"))
+f
+```
+
+<!-- Create a line graph for the same data. With
+error bars of course!-->
+
+Although, we shouldn't make a line graph for these data, my
+moronic instructor thinks I need the practice. Oh, shoot. I
+hope he doesn't dock my grade for that. Whatevs. lol! :)
+
+<!-- Don't use slang, 1377 speak, emoji, or abbreviations
+that are so popular in texting. Lulz ;) is not ok for this
+assignment.-->
+
+```{r}
+f<-ggplot(temp, aes(x=party, y=means, group=sex, color=sex))+
+    geom_line(size=1)+
+    geom_point(size=2)+
+    scale_color_manual(values=c(col1,col2),name="Sex",breaks=c("female","male"),labels=c("Female", "Male"))+
+    geom_errorbar(aes(ymax=means+sems, ymin=means-sems),width=.2)+
+    ggtitle("Incomes by Sex and Political Affiliation")+
+    labs(x="Political Party Affiliation",y="Income\n(thousands of dollars)")+
+    scale_x_discrete(breaks=c("democrat","independent","republican"),labels=c("Democrat","Independent","Republican"))+
+    theme(plot.title=element_text(size=15,face="bold",vjust=.5))+
+    theme(axis.title.x=element_text(size=12,face="bold",vjust=-.25))+
+    theme(axis.title.y=element_text(size=12,face="bold",vjust=1))+
+    theme(axis.text.x=element_text(size=10,face="bold",color="black"))+
+    theme(axis.text.y=element_text(size=10,face="bold",color="black"))+
+    coord_cartesian(ylim=c(min(temp$means)-2*max(temp$sems),max(temp$means)+2*max(temp$sems)))+
+    theme(panel.border=element_blank(),axis.line=element_line())+
+    theme(panel.grid.major.x=element_blank())+
+    theme(panel.grid.major.y=element_line(color="darkgrey"))+
+    theme(panel.grid.minor.y=element_blank())+
+    theme(legend.position=c(.2,.76))+
+    theme(legend.background=element_blank())+
+    theme(legend.background=element_rect(color="black"))+
+    theme(legend.title=element_blank())+
+    theme(legend.title=element_text(size=12))+
+    theme(legend.title.align=.5)+
+    theme(legend.text=element_text(size=10,face="bold"))
+f
+```
+
+<!-- Run a test to see if optimism scores pre- and post
+watching videos depends on party affiliation-->
+
+To see if optimism scores before and after watching *AFHV*
+vary depending on party affiliation, I'm going to run a
+2-way mixed ANOVA. I'm using a mixed ANOVA because the same
+people indicated their optimism before and after the videos
+(i.e. a within-subjects factor) and because different
+people are affiliated with different political parties (i.e.
+a between-subjects factor).
+
+```{r}
+summary(aov(optimismscore~testtime*party+Error(subject/testtime),data=pols))
+```
+
+Although optimism scores were related to political affiliation, F(2, 63)
+= 32.56, p < .001, and affected by watching videos, F(1, 63) = 42.53, p
+< .001, there was no interaction between taking the test before or after
+watching videos and their party affiliation, F(2, 63) = 1.48, p = .24.
+
+<!-- Run a Multiple Regression Analysis to see
+whether you can predict someones pretest optimism
+scores from their income and sex. Create a figure
+that shows the distributions of pretest optimism,
+income and sex and create lines that best fit the
+data for both sexes regardless of whether the lines
+are warranted based on the statistical analyses-->
+
+I'm going to perform Multiple Regression
+to predict pretest optimism scores from income and
+sex.
+
+```{r}
+summary(lm(optimismscore~income+sex,data=pols[pols$testtime=="pre",]))
+```
+The linear model predicting pretest optimism scores from income
+and sex doesn't explain any variance, R^2 = .014, F(2, 63) = .44,
+p = .65. Despite this lack of significance, I'm creating a
+scatter plot because my wonderful instructor thinks that practice
+makes perfect.
+
+```{r}
+f<-ggplot(pols[pols$testtime=="pre",],aes(x=income,y=optimismscore,color=sex))+
+    geom_point(size=2)+
+    geom_abline(intercept=60.2+2.51/2, slope=-.092,color=col1)+
+    geom_abline(intercept=60.2-2.51/2, slope=-.092,color=col2)+
+    scale_color_manual(values=c(col1,col2),breaks=c("female","male"),labels=c("Female","Male"))+
+    ggtitle("Optimism Predicted by Sex and Income")+
+    labs(x="Income (Thousands of Dollars)",y="Optimism Score\n(Higher=More)")+
+    theme(plot.title=element_text(size=15,face="bold", vjust=.5))+
+    theme(axis.title.x=element_text(size=12,face="bold", vjust=-.25))+
+    theme(axis.title.y=element_text(size=12,face="bold", vjust=1))+
+    theme(axis.text.x=element_text(size=10,face="bold",color="black"))+
+    theme(axis.text.y=element_text(size=10,face="bold",color="black"))+
+    theme(panel.border=element_blank(), axis.line=element_line())+
+    theme(panel.grid.major.x=element_blank())+
+    theme(panel.grid.minor.x=element_blank())+
+    theme(panel.grid.major.y=element_line(color="darkgrey"))+
+    theme(panel.grid.minor.y=element_blank())+
+    theme(legend.position=c(.83,.86))+
+    theme(legend.background=element_blank())+
+    theme(legend.title=element_blank())+
+    theme(legend.text=element_text(size=10,face="bold"))
+f
+```
+
+***Fin***
