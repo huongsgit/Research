@@ -69,9 +69,9 @@ t.test(data$Total[data$Time==1 & data$Feedback=="P"],data$Total[data$Time==1
 ``` 
 
 <!-- I wanted to see if there was a difference in Pretest scores (Time==1) before 
-the manipulation of Positve or Negative Feedback. Because there were 2 different
+the manipulation of Positive or Negative Feedback. Because there were 2 different
 groups of subjects, I ran a Welch Two Sample t-test that shows at df = 21.053, 
-p-value = 0.25, there is no signifant difference. -->
+p-value = 0.25, there is no significant difference. -->
 
 
 
@@ -83,7 +83,7 @@ t.test(data$Total[data$Time==2 & data$Feedback=="P"],data$Total[data$Time==2
 <!-- I wanted to see if there was a difference in Posttest scores (Time==2) 
 after manipulation, between Positve or Negative Feedback. Because there were 2 
 different groups of subjects, I ran a Welch Two Sample t-test that shows at 
-df = 21.67, p-value = 0.81, there is no signifant difference. -->
+df = 21.67, p-value = 0.81, there is no significant difference. -->
 
 
 ```{r}
@@ -94,7 +94,7 @@ t.test(data$Total[data$Time==1 & data$Feedback=="N"],data$Total[data$Time==2
 <!--  I wanted to see if there was a difference in Pretest and Posttest scores 
 (Time==1 & Time==2) for subjects in the Negative Feedback condition. Because 
 subjects were one group,I ran a Paired t-test that shows at 
-df = 11, p-value = 0.5123, there is no signifant difference. --> 
+df = 11, p-value = 0.51, there is no significant difference. --> 
 
 ```{r}
 t.test(data$Total[data$Time==1 & data$Feedback=="P"],data$Total[data$Time==2 
@@ -104,15 +104,15 @@ t.test(data$Total[data$Time==1 & data$Feedback=="P"],data$Total[data$Time==2
 <!--  I wanted to see if there was a difference in Pretest and Posttest scores 
 (Time==1 & Time==2) for subjects in the Positive Feedback condition. Because 
 subjects were one group,I ran a Paired t-test that shows at 
-df = 11, p-value = 0.04 (p<0.05), there is signifant difference. -->
+df = 11, p-value = 0.04 (p<0.05), there is significaant difference. -->
 
 
 ```{r}
 library("gplots")
 library("ggplot2")
 library("dplyr")
-col1=col2hex("deeppink")
-col2=col2hex("deepskyblue2")
+col1=col2hex("dark blue")
+col2=col2hex("yellow")
 temp<-data%>%group_by(Feedback,Time)%>%
 summarize(means=mean(Total),sems=sd(Total)/sqrt(length(Total)))
 f<-ggplot(temp, aes(x=Time, y=means, fill=Feedback))+
